@@ -1,7 +1,7 @@
 {
   "name": "restart-roblox-studio-simulator",
   "displayName": "Restart Roblox Studio Simulator",
-  "description": "VS Code extension for restarting the Roblox Studio simulations",
+  "description": "VS Code extension for restarting the Roblox Studio simulator",
   "keywords": [
     "roblox",
     "vscode",
