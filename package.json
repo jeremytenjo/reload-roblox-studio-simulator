@@ -1,8 +1,8 @@
 {
   "name": "roblox-studio-simulation-hot-reload",
-  "displayName": "test+",
-  "description": "",
+  "description": "VS Code extension for hot reloading Roblox Studio simulations and running tests",
   "version": "0.0.1",
+  "publisher": "tenjojeremy",
   "type": "module",
   "engines": {
     "vscode": "^1.107.0"
