@@ -1,4 +1,4 @@
-# Roblox Studio Simulation Hot Reload
+# Reload Roblox Studio Simulator
 
 A VS Code extension that enables hot-reload functionality for Roblox game development, allowing you to quickly test and restart your Roblox simulations without manual intervention.
 
