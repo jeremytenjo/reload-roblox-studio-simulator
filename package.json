@@ -8,9 +8,7 @@
   },
   "main": "./out/extension.js",
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:robloxAutoTest.runOrRestart",
-    "onSave"
+    "onStartupFinished"
   ],
   "contributes": {
     "commands": [
