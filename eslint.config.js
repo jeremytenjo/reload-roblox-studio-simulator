@@ -2,8 +2,8 @@ import { defineConfig } from 'eslint/config'
 import typescriptEslint from 'typescript-eslint'
 import eslintPluginRequireJsExtension from 'eslint-plugin-require-js-extension'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
-
 import importPlugin from 'eslint-plugin-import'
+
 import prettierConfig from './.prettierrc.js'
 
 export default defineConfig([
