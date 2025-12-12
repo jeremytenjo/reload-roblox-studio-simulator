@@ -1,4 +1,4 @@
--- AutoRestartPlayPlugin_WS (runtime harness + WS connect/disconnect buttons)
+-- RestartRobloxStudioSimulatorBridgePlugin (runtime harness + WS connect/disconnect buttons)
 -- Features:
 --   * Toolbar buttons: Connect WS / Disconnect WS
 --   * Studio PluginAction (bindable to F2) sends restart over WS
@@ -51,7 +51,7 @@ local function ensureHarness()
 	serverScript.Source = string.format(
 		[[
 -- ServerScriptService/StudioTestSessionManager_AutoTest
--- Auto-installed by AutoRestartPlayPlugin_WS
+-- Auto-installed by RestartRobloxStudioSimulatorBridgePlugin
 
 local RunService = game:GetService("RunService")
 local StudioTestService = game:GetService("StudioTestService")
@@ -148,7 +148,7 @@ connect()
 
 	localScript.Source = [[
 -- StarterPlayerScripts/StudioRestartHotkey_AutoTest
--- Auto-installed by AutoRestartPlayPlugin_WS
+-- Auto-installed by RestartRobloxStudioSimulatorBridgePlugin
 -- Press F2 in Play mode to request restart
 
 local RunService = game:GetService("RunService")
@@ -208,7 +208,7 @@ local function runLoop()
 
 	local okHarness, errHarness = pcall(ensureHarness)
 	if not okHarness then
-		warn("[AutoRestartPlayPlugin_WS] ensureHarness failed:", errHarness)
+		warn("[RestartRobloxStudioSimulatorBridgePlugin] ensureHarness failed:", errHarness)
 		isLoopRunning = false
 		return
 	end
@@ -220,7 +220,7 @@ local function runLoop()
 		end)
 
 		if not okExec then
-			warn("[AutoRestartPlayPlugin_WS] ExecutePlayModeAsync failed:", errExec)
+			warn("[RestartRobloxStudioSimulatorBridgePlugin] ExecutePlayModeAsync failed:", errExec)
 			break
 		end
 
@@ -240,7 +240,9 @@ local function restartLocal()
 		task.spawn(runLoop)
 	else
 		-- Restart is handled by the harness server script upon receiving WS message.
-		print("[AutoRestartPlayPlugin_WS] Test running; restart will be handled by harness when WS message arrives.")
+		print(
+			"[RestartRobloxStudioSimulatorBridgePlugin] Test running; restart will be handled by harness when WS message arrives."
+		)
 	end
 end
 
@@ -252,7 +254,7 @@ local wsClient = nil
 
 local function connectWS()
 	if wsClient then
-		print("[AutoRestartPlayPlugin_WS] WS already created (connected/connecting).")
+		print("[RestartRobloxStudioSimulatorBridgePlugin] WS already created (connected/connecting).")
 		return true
 	end
 
@@ -261,14 +263,14 @@ local function connectWS()
 	end)
 
 	if not ok then
-		warn("[AutoRestartPlayPlugin_WS] WS create failed:", clientOrErr)
+		warn("[RestartRobloxStudioSimulatorBridgePlugin] WS create failed:", clientOrErr)
 		return false
 	end
 
 	local client = clientOrErr
 
 	client.Opened:Connect(function()
-		print("[AutoRestartPlayPlugin_WS] WS opened (plugin):", WS_URL)
+		print("[RestartRobloxStudioSimulatorBridgePlugin] WS opened (plugin):", WS_URL)
 	end)
 
 	client.MessageReceived:Connect(function(message)
@@ -285,7 +287,7 @@ local function connectWS()
 	end)
 
 	client.Error:Connect(function(err)
-		warn("[AutoRestartPlayPlugin_WS] WS error (plugin):", err)
+		warn("[RestartRobloxStudioSimulatorBridgePlugin] WS error (plugin):", err)
 	end)
 
 	wsClient = client
@@ -294,12 +296,12 @@ end
 
 local function disconnectWS()
 	if not wsClient then
-		print("[AutoRestartPlayPlugin_WS] WS not connected.")
+		print("[RestartRobloxStudioSimulatorBridgePlugin] WS not connected.")
 		return
 	end
 	wsClient:Close()
 	wsClient = nil
-	print("[AutoRestartPlayPlugin_WS] WS closed (plugin).")
+	print("[RestartRobloxStudioSimulatorBridgePlugin] WS closed (plugin).")
 end
 
 local function sendRestart(source)
@@ -322,10 +324,10 @@ local function sendRestart(source)
 		if okEncode then
 			wsClient:Send(jsonOrErr)
 		else
-			warn("[AutoRestartPlayPlugin_WS] JSONEncode failed:", jsonOrErr)
+			warn("[RestartRobloxStudioSimulatorBridgePlugin] JSONEncode failed:", jsonOrErr)
 		end
 	else
-		warn("[AutoRestartPlayPlugin_WS] WS not connected; restart signaling may not work.")
+		warn("[RestartRobloxStudioSimulatorBridgePlugin] WS not connected; restart signaling may not work.")
 	end
 
 	-- Always start the loop locally if it isn't running yet.
