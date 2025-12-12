@@ -72,6 +72,14 @@ export function activate(context: vscode.ExtensionContext) {
 
   // NEW: Trigger on file save
   const onSaveDisposable = vscode.workspace.onDidSaveTextDocument((doc) => {
+    const disableAutoReload = vscode.workspace
+      .getConfiguration('reloadRobloxStudioSimulator')
+      .get('disableAutoReload', false)
+
+    if (disableAutoReload) {
+      return
+    }
+
     console.log(`${pacakgeName} file saved: ${doc.fileName}`)
 
     // Optional: filter by file pattern (e.g., only TypeScript/Lua files)

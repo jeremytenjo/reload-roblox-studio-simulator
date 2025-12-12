@@ -33,6 +33,20 @@ A VS Code extension that enables hot-reload functionality for Roblox game develo
 
 Connect your Roblox client to the WebSocket server at `ws://localhost:3010` to receive hot-reload messages.
 
+## Configuration
+
+### Disable Auto Reload
+
+To disable automatic reloading when files are saved, add the following to your VS Code settings (`.vscode/settings.json`):
+
+```json
+{
+  "reloadRobloxStudioSimulator.disableAutoReload": true
+}
+```
+
+When enabled, automatic reloading on file save is disabled. You can still use the `F2` keyboard shortcut to manually trigger a reload.
+
 ## Special Thanks
 
 Special thanks to **zephyras** for contributions and feedback!

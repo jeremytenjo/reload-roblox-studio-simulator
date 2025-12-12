@@ -24,7 +24,17 @@
         "key": "f2",
         "when": "true"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Roblox Studio Simulator",
+      "properties": {
+        "reloadRobloxStudioSimulator.disableAutoReload": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable automatic reloading when files are saved"
+        }
+      }
+    }
   },
   "scripts": {
     "dev": "tsc -watch -p ./",
