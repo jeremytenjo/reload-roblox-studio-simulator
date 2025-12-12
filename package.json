@@ -3,6 +3,7 @@
   "displayName": "test+",
   "description": "",
   "version": "0.0.1",
+  "type": "module",
   "engines": {
     "vscode": "^1.107.0"
   },
@@ -29,7 +30,8 @@
     "dev": "tsc -watch -p ./",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "test": "echo \"no tests\""
+    "test": "echo \"no tests\"",
+    "prettify": "prettier --write ."
   },
   "devDependencies": {
     "@types/mocha": "10.0.10",
@@ -41,6 +43,7 @@
     "esbuild": "0.27.1",
     "eslint": "9.39.1",
     "npm-run-all": "4.1.5",
+    "prettier": "3.7.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.48.1"
   },

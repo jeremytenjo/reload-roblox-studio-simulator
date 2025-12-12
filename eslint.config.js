@@ -1,4 +1,4 @@
-import typescriptEslint from 'typescript-eslint';
+import typescriptEslint from 'typescript-eslint'
 
 export default [
   {
@@ -30,4 +30,4 @@ export default [
       semi: 'warn',
     },
   },
-];
+]
