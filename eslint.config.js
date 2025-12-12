@@ -29,7 +29,7 @@ export default defineConfig([
 
   // Settings for Roblox TS source files
   {
-    basePath: './',
+    basePath: 'src',
     files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
       parser: typescriptEslint.parser,
