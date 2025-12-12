@@ -5,8 +5,6 @@
 --   * Receives restart over WS (from VS Code) and starts the loop if needed
 --   * Harness objects exist only while loop is running (created at start, destroyed at end)
 
-print("hasldfjask;dfjk")
-
 local RunService = game:GetService("RunService")
 if not RunService:IsStudio() or not RunService:IsEdit() then
 	-- Prevent running in Play server/client DataModels.
