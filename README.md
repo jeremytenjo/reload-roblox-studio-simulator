@@ -51,7 +51,7 @@ When enabled, automatic reloading on file save is disabled. You can still use th
 
 ## Special Thanks
 
-Special thanks to **zephyras** for contributions and feedback!
+Special thanks to **zephyras** and **oryaelia** for contributions and feedback!
 
 ## License
 
