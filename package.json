@@ -10,7 +10,7 @@
     "url": "https://github.com/jeremytenjo/restart-roblox-studio-simulator"
   },
   "type": "module",
-  "main": "./dist/extension.js",
+  "main": "./dist/index.js",
   "files": [
     "dist"
   ],
