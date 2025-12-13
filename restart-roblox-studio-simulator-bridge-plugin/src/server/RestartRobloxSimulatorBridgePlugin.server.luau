@@ -194,6 +194,46 @@ local function cleanupHarness()
 	end
 end
 
+local function showNotification(message, duration)
+	duration = duration or 2
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "NotificationGui"
+	screenGui.ResetOnSpawn = false
+	screenGui.Parent = game:GetService("CoreGui")
+
+	local notificationFrame = Instance.new("Frame")
+	notificationFrame.Name = "NotificationFrame"
+	notificationFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	notificationFrame.BorderSizePixel = 0
+	notificationFrame.Size = UDim2.new(0.4, 0, 0.06, 0)
+	notificationFrame.Position = UDim2.new(0.3, 0, 0.02, 0)
+	notificationFrame.Parent = screenGui
+
+	local iconLabel = Instance.new("ImageLabel")
+	iconLabel.Name = "NotificationIcon"
+	iconLabel.Image = "rbxassetid://125030218101854"
+	iconLabel.BackgroundTransparency = 1
+	iconLabel.Size = UDim2.new(0, 20, 0, 20)
+	iconLabel.Position = UDim2.new(0, 10, 0.5, -10)
+	iconLabel.Parent = notificationFrame
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Name = "NotificationLabel"
+	textLabel.Text = message
+	textLabel.TextScaled = false
+	textLabel.TextSize = 15
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.BackgroundTransparency = 1
+	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel.BorderSizePixel = 0
+	textLabel.Size = UDim2.new(1, -50, 1, 0)
+	textLabel.Position = UDim2.new(0, 38, 0, 0)
+	textLabel.Parent = notificationFrame
+
+	task.wait(duration)
+	screenGui:Destroy()
+end
+
 ----------------------------------------------------------------------
 -- Test loop (edit DataModel only)
 ----------------------------------------------------------------------
@@ -264,6 +304,7 @@ local function connectWS()
 
 	if not ok then
 		warn("[RestartRobloxStudioSimulatorBridgePlugin] WS create failed:", clientOrErr)
+		showNotification("Failed to connect to VS Code extension", 3)
 		return false
 	end
 
@@ -288,6 +329,7 @@ local function connectWS()
 
 	client.Error:Connect(function(err)
 		warn("[RestartRobloxStudioSimulatorBridgePlugin] WS error (plugin):", err)
+		showNotification("WebSocket connection error", 3)
 	end)
 
 	wsClient = client
@@ -337,46 +379,6 @@ end
 ----------------------------------------------------------------------
 -- Plugin UI: ONLY connect/disconnect buttons + PluginAction for keybind
 ----------------------------------------------------------------------
-
-local function showNotification(message, duration)
-	duration = duration or 2
-	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = "NotificationGui"
-	screenGui.ResetOnSpawn = false
-	screenGui.Parent = game:GetService("CoreGui")
-
-	local notificationFrame = Instance.new("Frame")
-	notificationFrame.Name = "NotificationFrame"
-	notificationFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-	notificationFrame.BorderSizePixel = 0
-	notificationFrame.Size = UDim2.new(0.4, 0, 0.06, 0)
-	notificationFrame.Position = UDim2.new(0.3, 0, 0.02, 0)
-	notificationFrame.Parent = screenGui
-
-	local iconLabel = Instance.new("ImageLabel")
-	iconLabel.Name = "NotificationIcon"
-	iconLabel.Image = "rbxassetid://125030218101854"
-	iconLabel.BackgroundTransparency = 1
-	iconLabel.Size = UDim2.new(0, 20, 0, 20)
-	iconLabel.Position = UDim2.new(0, 10, 0.5, -10)
-	iconLabel.Parent = notificationFrame
-
-	local textLabel = Instance.new("TextLabel")
-	textLabel.Name = "NotificationLabel"
-	textLabel.Text = message
-	textLabel.TextScaled = false
-	textLabel.TextSize = 15
-	textLabel.TextXAlignment = Enum.TextXAlignment.Left
-	textLabel.BackgroundTransparency = 1
-	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	textLabel.BorderSizePixel = 0
-	textLabel.Size = UDim2.new(1, -50, 1, 0)
-	textLabel.Position = UDim2.new(0, 38, 0, 0)
-	textLabel.Parent = notificationFrame
-
-	task.wait(duration)
-	screenGui:Destroy()
-end
 
 local toolbar = plugin:CreateToolbar("Restart Roblox Studio Simulator Bridge")
 
