@@ -338,7 +338,7 @@ end
 -- Plugin UI: ONLY connect/disconnect buttons + PluginAction for keybind
 ----------------------------------------------------------------------
 
-local toolbar = plugin:CreateToolbar("Auto Restart Play (WS)")
+local toolbar = plugin:CreateToolbar("Restart Roblox Studio Simulator Bridge")
 
 local connectButton = toolbar:CreateButton("Connect", "Connect to VS Code extension", "126561959012757")
 
