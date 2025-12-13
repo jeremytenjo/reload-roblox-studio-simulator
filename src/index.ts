@@ -70,6 +70,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(cmd)
 
+  // Create status bar button
+  const statusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    100,
+  )
+  statusBarItem.command = 'restartRobloxStudioSimulator.restart'
+  statusBarItem.text = '$(refresh) Restart Roblox Simulator'
+  statusBarItem.tooltip = 'Restart Roblox Studio Simulator'
+  statusBarItem.show()
+  context.subscriptions.push(statusBarItem)
+
   // NEW: Trigger on file save
   const onSaveDisposable = vscode.workspace.onDidSaveTextDocument((doc) => {
     const disableAutoReload = vscode.workspace

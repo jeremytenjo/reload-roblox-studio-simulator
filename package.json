@@ -58,14 +58,6 @@
         "when": "true"
       }
     ],
-    "menus": {
-      "statusBar/right": [
-        {
-          "command": "restartRobloxStudioSimulator.restart",
-          "group": "1_modification"
-        }
-      ]
-    },
     "configuration": {
       "title": "Roblox Studio Simulator",
       "properties": {
