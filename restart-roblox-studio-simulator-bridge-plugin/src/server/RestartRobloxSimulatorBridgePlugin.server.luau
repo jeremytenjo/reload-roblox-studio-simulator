@@ -294,6 +294,7 @@ end
 local wsClient = nil
 
 local function connectWS()
+	print("[RestartRobloxStudioSimulatorBridgePlugin] wsClient", wsClient)
 	if wsClient then
 		print("[RestartRobloxStudioSimulatorBridgePlugin] WS already created (connected/connecting).")
 		return true

@@ -17,28 +17,49 @@ function broadcast(msg: RestartMessage) {
   console.log(`${pacakgeName}: Broadcasting`, {
     msg,
     wss,
+    clientCount: wss?.clients.size ?? 0,
   })
 
   if (!wss) {
     console.log(
       `${pacakgeName}: WebSocket server is not running, cannot broadcast message`,
     )
-
+    console.log(`${pacakgeName}: Make sure the Roblox plugin is running and connected`)
     return
   }
 
   if (wss.clients.size === 0) {
-    console.log(`${pacakgeName}: No clients connected, skipping broadcast`)
+    console.warn(`${pacakgeName}: ⚠️  No clients connected, skipping broadcast`)
+    console.warn(
+      `${pacakgeName}: Expected a connection from Roblox Studio Plugin on ws://localhost:${port}`,
+    )
+    console.warn(`${pacakgeName}: Debugging steps:`)
+    console.warn(`  1. Check if Roblox Studio is running`)
+    console.warn(`  2. Click the 'Connect' button in Roblox Studio toolbar`)
+    console.warn(`  3. Check Roblox Studio Output panel for errors`)
+    console.warn(`  4. Verify port ${port} is not blocked by firewall`)
     return
   }
 
   const payload = JSON.stringify(msg)
+  console.log(`${pacakgeName}: Sending to ${wss.clients.size} client(s): ${payload}`)
 
+  let sentCount = 0
   for (const client of wss.clients) {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(payload)
+      try {
+        client.send(payload)
+        sentCount++
+      } catch (err) {
+        console.error(`${pacakgeName}: Failed to send to client:`, err)
+      }
+    } else {
+      console.warn(`${pacakgeName}: Client in state ${client.readyState}, skipping`)
     }
   }
+  console.log(
+    `${pacakgeName}: Successfully sent to ${sentCount}/${wss.clients.size} clients`,
+  )
 }
 
 function updateWebSocketStatusBar() {
@@ -57,42 +78,73 @@ function updateWebSocketStatusBar() {
 
 function startWebSocket(p: { dontShowInformationMessage?: boolean } = {}) {
   if (wss) {
+    console.warn(`${pacakgeName}: WebSocket already running on ws://localhost:${port}`)
     vscode.window.showWarningMessage(
       'Restart Roblox Studio Simuluator: WebSocket is already running',
     )
     return
   }
 
+  console.log(`${pacakgeName}: Starting WebSocket server on port ${port}...`)
+
   wss = new WebSocketServer({ port }, () => {
-    console.log(`${pacakgeName} WebSocket listening on ws://localhost:${port}`)
+    console.log(`${pacakgeName} ✓ WebSocket listening on ws://localhost:${port}`)
+    console.log(`${pacakgeName} ℹ️  Waiting for Roblox Studio Plugin to connect...`)
     if (!p.dontShowInformationMessage) {
       vscode.window.showInformationMessage('Restart Roblox Studio Simuluator is active')
     }
     updateWebSocketStatusBar()
   })
 
-  wss.on('connection', (socket: WebSocket) => {
-    console.log(`${pacakgeName} client connected`)
+  wss.on('error', (err) => {
+    console.error(`${pacakgeName}: WebSocket server error:`, err)
+    if ((err as any).code === 'EADDRINUSE') {
+      console.error(`${pacakgeName}: ⚠️  Port ${port} is already in use!`)
+      console.error(
+        `${pacakgeName}: Try closing other applications or restarting VS Code`,
+      )
+    }
+    vscode.window.showErrorMessage(`WebSocket error: ${(err as any).message}`)
+  })
 
-    socket.on('close', () => {
-      console.log(`${pacakgeName} client disconnected`)
+  wss.on('connection', (socket: WebSocket, req) => {
+    const clientIp = req?.socket?.remoteAddress ?? 'unknown'
+    console.log(`${pacakgeName}: ✓ Client connected from ${clientIp}`)
+    console.log(`${pacakgeName}: Total clients: ${wss?.clients.size}`)
+
+    socket.on('close', (code, reason) => {
+      console.log(
+        `${pacakgeName}: Client disconnected (code: ${code}, reason: ${reason})`,
+      )
+      console.log(`${pacakgeName}: Remaining clients: ${wss?.clients.size}`)
+    })
+
+    socket.on('error', (err) => {
+      console.error(`${pacakgeName}: Socket error:`, err)
     })
 
     socket.on('message', (data) => {
-      console.log(`${pacakgeName} received message:`, data.toString())
-
       try {
-        const parsed = JSON.parse(data.toString())
+        const message = data.toString()
+        console.log(`${pacakgeName}: Received message from ${clientIp}: ${message}`)
+
+        const parsed = JSON.parse(message)
+        console.log(`${pacakgeName}: Parsed message:`, parsed)
+
         if (parsed && parsed.type === 'restart') {
+          console.log(`${pacakgeName}: ✓ Valid restart message from ${parsed.source}`)
           const msg: RestartMessage = {
             type: 'restart',
             source: parsed.source ?? 'roblox',
             timestamp: Date.now(),
           }
           broadcast(msg)
+        } else {
+          console.warn(`${pacakgeName}: Unknown message type: ${parsed?.type}`)
         }
-      } catch {
-        // ignore malformed messages
+      } catch (err) {
+        console.error(`${pacakgeName}: Failed to parse message:`, err)
+        console.error(`${pacakgeName}: Raw data: ${data.toString()}`)
       }
     })
   })
@@ -100,19 +152,27 @@ function startWebSocket(p: { dontShowInformationMessage?: boolean } = {}) {
 
 function stopWebSocket() {
   if (!wss) {
+    console.warn(`${pacakgeName}: WebSocket is not running`)
     vscode.window.showWarningMessage(
       'Restart Roblox Studio Simuluator: WebSocket is not running',
     )
     return
   }
 
-  wss.close()
+  console.log(
+    `${pacakgeName}: Stopping WebSocket server (${wss.clients.size} clients connected)`,
+  )
+  wss.close(() => {
+    console.log(`${pacakgeName}: ✓ WebSocket server closed`)
+  })
   wss = undefined
   vscode.window.showInformationMessage('Restart Roblox Studio Simuluator stopped')
   updateWebSocketStatusBar()
 }
 
 export function activate(context: vscode.ExtensionContext) {
+  console.log(`${pacakgeName}: Extension activated`)
+
   // Start WebSocket on activation
   startWebSocket({
     dontShowInformationMessage: true,
@@ -140,6 +200,7 @@ export function activate(context: vscode.ExtensionContext) {
   const restartCmd = vscode.commands.registerCommand(
     'restartRobloxStudioSimulator.restart',
     () => {
+      console.log(`${pacakgeName}: Restart command triggered from VS Code`)
       const msg: RestartMessage = {
         type: 'restart',
         source: 'vscode',
@@ -183,13 +244,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Optional: filter by file pattern (e.g., only TypeScript/Lua files)
     if (doc.fileName.match(/\.(ts|tsx|js|jsx|lua|luau)$/)) {
+      console.log(`${pacakgeName}: File saved: ${doc.fileName}`)
       const msg: RestartMessage = {
         type: 'restart',
         source: 'vscode-autosave',
         timestamp: Date.now(),
       }
       broadcast(msg)
-      console.log(`${pacakgeName} triggered by file save: ${doc.fileName}`)
     }
   })
 
