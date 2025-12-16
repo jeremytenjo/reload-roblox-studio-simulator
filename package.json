@@ -31,9 +31,9 @@
   "scripts": {
     "dev": "npm run -S build -- --watch",
     "build": "esbuild ./src/index.ts --bundle --outfile=dist/index.js --external:vscode --format=cjs --platform=node",
-    "deploy:patch": "npm version patch && npm run lint && npm run build && vsce publish",
-    "deploy:minor": "npm version minor && npm run lint && npm run build && vsce publish",
-    "deploy:major": "npm version major && npm run lint && npm run build && vsce publish",
+    "deploy:patch": "npm run lint && npm run build && npm version patch && vsce publish",
+    "deploy:minor": "npm run lint && npm run build && npm version minor && vsce publish",
+    "deploy:major": "npm run lint && npm run build && npm version major && vsce publish",
     "test": "echo \"no tests\"",
     "prettify": "prettier --write .",
     "lint": "npm run tests:lint && npm run tests:ts-types",
