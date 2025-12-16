@@ -350,24 +350,100 @@ local function sendRestart(source)
 end
 
 ----------------------------------------------------------------------
--- Configuration Widget
+-- Configuration Widget (Studio theme-aware)
 ----------------------------------------------------------------------
 
 local configWidget = nil
+local themeChangedConnection = nil
+
+-- Helper: Set mouse cursor for interactive elements
+local function setCursor(cursorAsset)
+	plugin:GetMouse().Icon = cursorAsset
+end
+
+-- Helper: Sync GUI colors with Studio theme
+local function syncGuiColors(objects, textLabels, textBoxes, buttons)
+	local function setColors()
+		local theme = settings().Studio.Theme
+
+		-- Sync main background elements
+		for _, guiObject in objects do
+			guiObject.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainBackground)
+		end
+
+		-- Sync text labels
+		for _, label in textLabels do
+			label.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainText)
+		end
+
+		-- Sync text boxes with input field styling
+		for _, textBox in textBoxes do
+			textBox.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.InputFieldBackground)
+			textBox.BorderColor3 = theme:GetColor(Enum.StudioStyleGuideColor.InputFieldBorder)
+			textBox.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainText)
+			textBox.PlaceholderColor3 = theme:GetColor(Enum.StudioStyleGuideColor.DimmedText)
+		end
+
+		-- Sync buttons with button styling
+		for _, button in buttons do
+			if button:GetAttribute("ButtonType") == "Primary" then
+				button.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.DialogMainButton)
+				button.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.DialogMainButtonText)
+			else
+				button.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.DialogButton)
+				button.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.DialogButtonText)
+			end
+		end
+	end
+
+	-- Run initially
+	setColors()
+
+	-- Connect to theme changes
+	return settings().Studio.ThemeChanged:Connect(setColors)
+end
+
+-- Helper: Add hover cursor to interactive element
+local function addHoverCursor(guiObject, cursorType)
+	cursorType = cursorType or "rbxasset://SystemCursors/PointingHand"
+
+	guiObject.MouseEnter:Connect(function()
+		setCursor(cursorType)
+	end)
+
+	guiObject.MouseLeave:Connect(function()
+		setCursor("")
+	end)
+end
 
 local function createConfigWidget()
-	local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, false, 350, 220, 300, 200)
+	-- Widget info: don't override previous enabled state (false for InitialEnabledShouldOverrideRestore)
+	local widgetInfo = DockWidgetPluginGuiInfo.new(
+		Enum.InitialDockState.Float, -- Floating panel
+		true, -- Initially enabled
+		false, -- Don't override previous enabled state
+		350, -- Default width
+		220, -- Default height
+		300, -- Minimum width
+		200 -- Minimum height
+	)
 
 	local widget = plugin:CreateDockWidgetPluginGui("RestartRobloxStudioSimulatorSettings", widgetInfo)
 	widget.Title = "Simulator Settings"
 
+	-- Collections for theme syncing
+	local backgroundObjects = {}
+	local textLabels = {}
+	local textBoxes = {}
+	local buttons = {}
+
 	-- Main frame
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Name = "MainFrame"
-	mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 	mainFrame.BorderSizePixel = 0
 	mainFrame.Size = UDim2.new(1, 0, 1, 0)
 	mainFrame.Parent = widget
+	table.insert(backgroundObjects, mainFrame)
 
 	local padding = Instance.new("UIPadding")
 	padding.PaddingLeft = UDim.new(0, 15)
@@ -387,12 +463,12 @@ local function createConfigWidget()
 	portLabel.Name = "PortLabel"
 	portLabel.Text = "WebSocket Port:"
 	portLabel.TextSize = 13
-	portLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 	portLabel.BackgroundTransparency = 1
 	portLabel.TextXAlignment = Enum.TextXAlignment.Left
 	portLabel.Size = UDim2.new(1, 0, 0, 20)
 	portLabel.LayoutOrder = 1
 	portLabel.Parent = mainFrame
+	table.insert(textLabels, portLabel)
 
 	-- Port input
 	local savedPort = game:GetAttribute(PROJECT_CONFIG_KEY) or ""
@@ -401,13 +477,15 @@ local function createConfigWidget()
 	portInput.Text = savedPort
 	portInput.PlaceholderText = "e.g., 3010"
 	portInput.TextSize = 13
-	portInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-	portInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	portInput.BorderColor3 = Color3.fromRGB(80, 80, 80)
 	portInput.BorderSizePixel = 1
 	portInput.Size = UDim2.new(1, 0, 0, 25)
 	portInput.LayoutOrder = 2
+	portInput.ClearTextOnFocus = false
 	portInput.Parent = mainFrame
+	table.insert(textBoxes, portInput)
+
+	-- Add I-beam cursor for text input
+	addHoverCursor(portInput, "rbxasset://SystemCursors/IBeam")
 
 	-- Button container
 	local buttonContainer = Instance.new("Frame")
@@ -423,34 +501,38 @@ local function createConfigWidget()
 	buttonLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	buttonLayout.Parent = buttonContainer
 
-	-- Save button
+	-- Save button (Primary)
 	local saveButton = Instance.new("TextButton")
 	saveButton.Name = "SaveButton"
 	saveButton.Text = "Save"
 	saveButton.TextSize = 12
-	saveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	saveButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
 	saveButton.BorderSizePixel = 0
 	saveButton.Size = UDim2.new(0.5, -5, 1, 0)
 	saveButton.LayoutOrder = 1
+	saveButton.AutoButtonColor = true
+	saveButton:SetAttribute("ButtonType", "Primary")
 	saveButton.Parent = buttonContainer
+	table.insert(buttons, saveButton)
+	addHoverCursor(saveButton)
 
-	-- Cancel button
+	-- Cancel button (Secondary)
 	local cancelButton = Instance.new("TextButton")
 	cancelButton.Name = "CancelButton"
 	cancelButton.Text = "Cancel"
 	cancelButton.TextSize = 12
-	cancelButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	cancelButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
 	cancelButton.BorderSizePixel = 0
 	cancelButton.Size = UDim2.new(0.5, -5, 1, 0)
 	cancelButton.LayoutOrder = 2
+	cancelButton.AutoButtonColor = true
+	cancelButton:SetAttribute("ButtonType", "Secondary")
 	cancelButton.Parent = buttonContainer
+	table.insert(buttons, cancelButton)
+	addHoverCursor(cancelButton)
 
 	-- Status label
 	local statusLabel = Instance.new("TextLabel")
 	statusLabel.Name = "StatusLabel"
-	statusLabel.Text = WS_URL and "✓ Connected" or "Port not set"
+	statusLabel.Text = WS_URL and ("✓ Port configured: " .. tostring(WS_PORT)) or "Port not set"
 	statusLabel.TextSize = 11
 	statusLabel.TextColor3 = WS_URL and Color3.fromRGB(100, 200, 100) or Color3.fromRGB(200, 100, 100)
 	statusLabel.BackgroundTransparency = 1
@@ -458,6 +540,10 @@ local function createConfigWidget()
 	statusLabel.Size = UDim2.new(1, 0, 0, 20)
 	statusLabel.LayoutOrder = 4
 	statusLabel.Parent = mainFrame
+	-- Note: statusLabel not added to textLabels as it has custom coloring
+
+	-- Sync colors with Studio theme
+	themeChangedConnection = syncGuiColors(backgroundObjects, textLabels, textBoxes, buttons)
 
 	-- Save functionality
 	saveButton.MouseButton1Click:Connect(function()
@@ -487,14 +573,12 @@ local function createConfigWidget()
 		statusLabel.TextColor3 = Color3.fromRGB(100, 200, 100)
 
 		task.wait(1)
-		widget:Close()
-		configWidget = nil
+		widget.Enabled = false
 	end)
 
 	-- Cancel functionality
 	cancelButton.MouseButton1Click:Connect(function()
-		widget:Close()
-		configWidget = nil
+		widget.Enabled = false
 	end)
 
 	return widget
@@ -502,11 +586,7 @@ end
 
 local function showConfigWidget()
 	if configWidget then
-		if configWidget.Enabled then
-			configWidget:SetEnabled(false)
-		else
-			configWidget:SetEnabled(true)
-		end
+		configWidget.Enabled = not configWidget.Enabled
 	else
 		configWidget = createConfigWidget()
 	end
