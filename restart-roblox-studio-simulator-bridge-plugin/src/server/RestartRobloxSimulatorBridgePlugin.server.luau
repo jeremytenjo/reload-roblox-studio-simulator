@@ -572,6 +572,10 @@ local function createConfigWidget()
 		statusLabel.Text = "✓ Saved! Port: " .. tostring(WS_PORT)
 		statusLabel.TextColor3 = Color3.fromRGB(100, 200, 100)
 
+		-- Automatically connect with the new port
+		task.wait(0.5)
+		connectWS()
+
 		task.wait(1)
 		widget.Enabled = false
 	end)
