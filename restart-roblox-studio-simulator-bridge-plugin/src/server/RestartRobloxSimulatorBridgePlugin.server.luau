@@ -471,10 +471,10 @@ local function createConfigWidget()
 	table.insert(textLabels, portLabel)
 
 	-- Port input
-	local savedPort = game:GetAttribute(PROJECT_CONFIG_KEY) or ""
+	local connectdPort = game:GetAttribute(PROJECT_CONFIG_KEY) or ""
 	local portInput = Instance.new("TextBox")
 	portInput.Name = "PortInput"
-	portInput.Text = savedPort
+	portInput.Text = connectdPort
 	portInput.PlaceholderText = "e.g., 3010"
 	portInput.TextSize = 13
 	portInput.BorderSizePixel = 1
@@ -501,33 +501,33 @@ local function createConfigWidget()
 	buttonLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	buttonLayout.Parent = buttonContainer
 
-	-- Save button (Primary)
-	local saveButton = Instance.new("TextButton")
-	saveButton.Name = "SaveButton"
-	saveButton.Text = "Save"
-	saveButton.TextSize = 12
-	saveButton.BorderSizePixel = 0
-	saveButton.Size = UDim2.new(0.5, -5, 1, 0)
-	saveButton.LayoutOrder = 1
-	saveButton.AutoButtonColor = true
-	saveButton:SetAttribute("ButtonType", "Primary")
-	saveButton.Parent = buttonContainer
-	table.insert(buttons, saveButton)
-	addHoverCursor(saveButton)
+	-- Connect button (Primary)
+	local connectButton = Instance.new("TextButton")
+	connectButton.Name = "ConnectButton"
+	connectButton.Text = "Connect"
+	connectButton.TextSize = 12
+	connectButton.BorderSizePixel = 0
+	connectButton.Size = UDim2.new(0.5, -5, 1, 0)
+	connectButton.LayoutOrder = 1
+	connectButton.AutoButtonColor = true
+	connectButton:SetAttribute("ButtonType", "Primary")
+	connectButton.Parent = buttonContainer
+	table.insert(buttons, connectButton)
+	addHoverCursor(connectButton)
 
-	-- Cancel button (Secondary)
-	local cancelButton = Instance.new("TextButton")
-	cancelButton.Name = "CancelButton"
-	cancelButton.Text = "Cancel"
-	cancelButton.TextSize = 12
-	cancelButton.BorderSizePixel = 0
-	cancelButton.Size = UDim2.new(0.5, -5, 1, 0)
-	cancelButton.LayoutOrder = 2
-	cancelButton.AutoButtonColor = true
-	cancelButton:SetAttribute("ButtonType", "Secondary")
-	cancelButton.Parent = buttonContainer
-	table.insert(buttons, cancelButton)
-	addHoverCursor(cancelButton)
+	-- Disconnect button (Secondary)
+	local disconnectButton = Instance.new("TextButton")
+	disconnectButton.Name = "DisconnectButton"
+	disconnectButton.Text = "Disconnect"
+	disconnectButton.TextSize = 12
+	disconnectButton.BorderSizePixel = 0
+	disconnectButton.Size = UDim2.new(0.5, -5, 1, 0)
+	disconnectButton.LayoutOrder = 2
+	disconnectButton.AutoButtonColor = true
+	disconnectButton:SetAttribute("ButtonType", "Secondary")
+	disconnectButton.Parent = buttonContainer
+	table.insert(buttons, disconnectButton)
+	addHoverCursor(disconnectButton)
 
 	-- Status label
 	local statusLabel = Instance.new("TextLabel")
@@ -546,7 +546,7 @@ local function createConfigWidget()
 	themeChangedConnection = syncGuiColors(backgroundObjects, textLabels, textBoxes, buttons)
 
 	-- Save functionality
-	saveButton.MouseButton1Click:Connect(function()
+	connectButton.MouseButton1Click:Connect(function()
 		local input = portInput.Text:match("^%d+$")
 		if not input then
 			statusLabel.Text = "Invalid port (must be a number)"
@@ -569,7 +569,7 @@ local function createConfigWidget()
 		WS_PORT = port
 		WS_URL = "ws://localhost:" .. tostring(WS_PORT)
 
-		statusLabel.Text = "✓ Saved! Port: " .. tostring(WS_PORT)
+		statusLabel.Text = "✓ Connected to Port: " .. tostring(WS_PORT)
 		statusLabel.TextColor3 = Color3.fromRGB(100, 200, 100)
 
 		-- Automatically connect with the new port
@@ -581,7 +581,7 @@ local function createConfigWidget()
 	end)
 
 	-- Cancel functionality
-	cancelButton.MouseButton1Click:Connect(function()
+	disconnectButton.MouseButton1Click:Connect(function()
 		widget.Enabled = false
 	end)
 
