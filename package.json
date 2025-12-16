@@ -71,6 +71,12 @@
     "configuration": {
       "title": "Restart Roblox Studio Simulator",
       "properties": {
+        "restartRobloxStudioSimulator.websocketPort": {
+          "type": "number",
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "WebSocket port for this VSCode workspace instance"
+        },
         "restartRobloxStudioSimulator.disableAutoReload": {
           "type": "boolean",
           "default": false,

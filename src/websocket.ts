@@ -2,7 +2,13 @@ import { WebSocketServer, WebSocket } from 'ws'
 import * as vscode from 'vscode'
 
 import { setupWebSocketSocketHandlers } from './handlers/websocket.js'
-import { PACKAGE_NAME, PORT } from './constants.js'
+import { PACKAGE_NAME } from './constants.js'
+import assertWebsocketPortConfig from './utils/assertWebsocketPortConfig.js'
+
+export function getWebSocketPort(): number | undefined {
+  const config = vscode.workspace.getConfiguration('restartRobloxStudioSimulator')
+  return config.get<number>('websocketPort')
+}
 
 type RestartMessage = {
   type: 'restart'
@@ -46,14 +52,18 @@ export function broadcast(msg: RestartMessage) {
 
   if (wss.clients.size === 0) {
     console.warn(`${PACKAGE_NAME}: ⚠️  No clients connected, skipping broadcast`)
+    const port = getWebSocketPort()
+    const portStr = port ? `:${port}` : '(not configured)'
     console.warn(
-      `${PACKAGE_NAME}: Expected a connection from Roblox Studio Plugin on ws://localhost:${PORT}`,
+      `${PACKAGE_NAME}: Expected a connection from Roblox Studio Plugin on ws://localhost${portStr}`,
     )
     console.warn(`${PACKAGE_NAME}: Debugging steps:`)
     console.warn(`  1. Check if Roblox Studio is running`)
     console.warn(`  2. Click the 'Connect' button in Roblox Studio toolbar`)
     console.warn(`  3. Check Roblox Studio Output panel for errors`)
-    console.warn(`  4. Verify port ${PORT} is not blocked by firewall`)
+    if (port) {
+      console.warn(`  4. Verify port ${port} is not blocked by firewall`)
+    }
     return
   }
 
@@ -93,10 +103,19 @@ export function updateWebSocketStatusBar() {
 }
 
 export function startWebSocket(p: { dontShowInformationMessage?: boolean } = {}) {
-  console.log(`${PACKAGE_NAME}: Starting WebSocket server on port ${PORT}...`)
+  const port = getWebSocketPort()
 
-  wss = new WebSocketServer({ port: PORT }, () => {
-    console.log(`${PACKAGE_NAME} ✓ WebSocket listening on ws://localhost:${PORT}`)
+  if (!port) {
+    if (!p.dontShowInformationMessage) {
+      assertWebsocketPortConfig()
+    }
+    return
+  }
+
+  console.log(`${PACKAGE_NAME}: Starting WebSocket server on port ${port}...`)
+
+  wss = new WebSocketServer({ port }, () => {
+    console.log(`${PACKAGE_NAME} ✓ WebSocket listening on ws://localhost:${port}`)
     console.log(`${PACKAGE_NAME} ℹ️  Waiting for Roblox Studio Plugin to connect...`)
     if (!p.dontShowInformationMessage) {
       vscode.window.showInformationMessage('Restart Roblox Studio Simuluator is active')
@@ -107,7 +126,7 @@ export function startWebSocket(p: { dontShowInformationMessage?: boolean } = {})
   wss.on('error', (err) => {
     console.error(`${PACKAGE_NAME}: WebSocket server error:`, err)
     if ((err as any).code === 'EADDRINUSE') {
-      console.error(`${PACKAGE_NAME}: ⚠️  Port ${PORT} is already in use!`)
+      console.error(`${PACKAGE_NAME}: ⚠️  Port ${port} is already in use!`)
       console.error(
         `${PACKAGE_NAME}: Try closing other applications or restarting VS Code`,
       )

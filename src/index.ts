@@ -1,6 +1,6 @@
 import type * as vscode from 'vscode'
 
-import { startWebSocket } from './websocket.js'
+import { getWebSocketPort, startWebSocket } from './websocket.js'
 import {
   registerStartCommand,
   registerStopCommand,
@@ -11,14 +11,17 @@ import {
   createWebSocketStatusBarItem,
 } from './handlers/statusBar.js'
 import { setupFileSaveListener, setupCleanupOnDeactivate } from './handlers/listeners.js'
+import { PACKAGE_NAME } from './constants.js'
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('Extension activated')
+  console.log(`${PACKAGE_NAME} Activated`)
+  const port = getWebSocketPort()
 
-  // Start WebSocket on activation
-  startWebSocket({
-    dontShowInformationMessage: true,
-  })
+  if (port) {
+    startWebSocket({
+      dontShowInformationMessage: true,
+    })
+  }
 
   // Register all commands
   registerStartCommand(context)

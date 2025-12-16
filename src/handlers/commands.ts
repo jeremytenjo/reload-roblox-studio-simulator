@@ -1,7 +1,13 @@
 import * as vscode from 'vscode'
 
-import { startWebSocket, stopWebSocket, broadcast } from '../websocket.js'
+import {
+  startWebSocket,
+  stopWebSocket,
+  broadcast,
+  getWebSocketPort,
+} from '../websocket.js'
 import { PACKAGE_NAME } from '../constants.js'
+import assertWebsocketPortConfig from '../utils/assertWebsocketPortConfig.js'
 
 type RestartMessage = {
   type: 'restart'
@@ -34,6 +40,13 @@ export function registerRestartCommand(context: vscode.ExtensionContext) {
     'restartRobloxStudioSimulator.restart',
     () => {
       console.log(`${PACKAGE_NAME}: Restart command triggered from VS Code`)
+      const port = getWebSocketPort()
+
+      if (!port) {
+        assertWebsocketPortConfig()
+        return
+      }
+
       const msg: RestartMessage = {
         type: 'restart',
         source: 'vscode',
