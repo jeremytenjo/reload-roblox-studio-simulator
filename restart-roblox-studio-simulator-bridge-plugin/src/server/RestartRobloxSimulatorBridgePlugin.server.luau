@@ -600,7 +600,7 @@ local toolbar = plugin:CreateToolbar("Restart Roblox Studio Simulator Bridge")
 
 local connectButton = toolbar:CreateButton("Connect", "Connect to VS Code extension", "rbxassetid://126561959012757")
 
-local configButton = toolbar:CreateButton("Settings", "Configure WebSocket port", "rbxassetid://109416153823841")
+local configButton = toolbar:CreateButton("Settings", "Configure WebSocket port", "rbxassetid://72730280135599")
 
 local disconnectButton =
 	toolbar:CreateButton("Disconnect", "Disconnect from VS Code extension", "rbxassetid://123998024261090")
