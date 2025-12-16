@@ -53,7 +53,7 @@ Restart Roblox Studio Simuluator starts automatically when the extension is acti
 
 ### Required: Set WebSocket Port
 
-The extension requires an explicit WebSocket port configuration. Each VS Code instance should use a unique port to support multiple simultaneous Roblox Studio instances.
+The extension requires an explicit port configuration. Each VS Code instance should use a unique port to support multiple simultaneous Roblox Studio instances.
 
 #### In VS Code
 

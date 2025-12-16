@@ -420,7 +420,7 @@ local function createConfigWindow()
 	-- Title
 	local titleLabel = Instance.new("TextLabel")
 	titleLabel.Name = "Title"
-	titleLabel.Text = "WebSocket Configuration"
+	titleLabel.Text = "Settings"
 	titleLabel.TextSize = 16
 	titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	titleLabel.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
