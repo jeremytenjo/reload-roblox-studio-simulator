@@ -4,7 +4,11 @@
 
 A VS Code extension that enables hot-reload functionality for Roblox game development, allowing you to quickly test and restart your Roblox simulator without manual intervention.
 
-https://github.com/jeremytenjo/restart-roblox-studio-simulator/blob/main/assets/videos/demo.mp4
+
+
+https://github.com/user-attachments/assets/8590a96b-4e1f-4410-ac09-ce2ea94d8c0e
+
+
 
 ## Features
 
