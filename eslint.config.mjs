@@ -15,15 +15,9 @@ export default defineConfig([
 
   // eslint config
   {
-    files: ['eslint.config.js'],
+    files: ['eslint.config.mjs'],
     rules: {
-      'prettier/prettier': [
-        'error',
-        {
-          ...prettierConfig,
-          endOfLine: 'off',
-        },
-      ],
+      'prettier/prettier': ['off'],
     },
   },
 
@@ -47,13 +41,7 @@ export default defineConfig([
       import: importPlugin,
     },
     rules: {
-      'prettier/prettier': [
-        'error',
-        {
-          ...prettierConfig,
-          endOfLine: 'off',
-        },
-      ],
+      'prettier/prettier': ['off'],
       'require-js-extension/require-js-extension': 'error',
       '@typescript-eslint/consistent-type-imports': 2,
       '@typescript-eslint/no-explicit-any': 0,
