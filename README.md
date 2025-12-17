@@ -4,11 +4,12 @@
 
 A VS Code extension that enables hot-reload functionality for Roblox game development, allowing you to quickly test and restart your Roblox simulator without manual intervention.
 
+https://firebasestorage.googleapis.com/v0/b/portfolio-83749.appspot.com/o/videos%2FCleanShot_2025-12-15_at_18.57.47.mp4?alt=media&token=cdbf3ce5-8a7d-4ef7-9398-6ae3a885a87a
+
 ## Features
 
 - **Auto Reload on Save**: Automatically triggers simulation restart when you save TypeScript, JavaScript, or Lua files
-- **Manual Trigger**: Press `F2` to trigger a "run or restart" command for your Roblox simulation
--**File Type Filtering**: Intelligently filters supported file types (`.ts`, `.tsx`, `.js`, `.jsx`, `.lua`, `.luau`)
+- **Manual Trigger**: Press `F2` to trigger a "run or restart" command for your Roblox simulation -**File Type Filtering**: Intelligently filters supported file types (`.ts`, `.tsx`, `.js`, `.jsx`, `.lua`, `.luau`)
 - **Restart Roblox Studio Simulator Management**: Start and stop the WebSocket server on demand via VS Code commands
 
 ## Installation
