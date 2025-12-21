@@ -5,6 +5,7 @@ import {
   stopWebSocket,
   broadcast,
   getWebSocketPort,
+  hasConnectedClients,
 } from '../websocket.js'
 import { PACKAGE_NAME } from '../constants.js'
 import assertWebsocketPortConfig from '../utils/assertWebsocketPortConfig.js'
@@ -56,6 +57,12 @@ export function registerRestartCommand(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(
         `Requested Roblox Studio Simulator Restart (Port: ${port})`,
       )
+
+      if (!hasConnectedClients()) {
+        vscode.window.showWarningMessage(
+          `⚠️ No Roblox Studio clients connected. Make sure the Roblox plugin is connected to port: ${port}`,
+        )
+      }
     },
   )
   context.subscriptions.push(restartCmd)

@@ -35,6 +35,10 @@ export function setWsStatusBarItem(item: vscode.StatusBarItem | undefined) {
   wsStatusBarItem = item
 }
 
+export function hasConnectedClients(): boolean {
+  return (wss?.clients.size ?? 0) > 0
+}
+
 export function broadcast(msg: RestartMessage) {
   console.log(`${PACKAGE_NAME}: Broadcasting`, {
     msg,
